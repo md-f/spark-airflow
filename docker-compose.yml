@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+    postgres:
+        image: postgres:9.6
+        container_name: postgres
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        volumes:
+            - ./postgres_data:/var/lib/postgresql/data
+
+    webserver:
+        image: spark-airflow
+        container_name: spark-airflow
+        restart: always
+        depends_on:
+            - postgres
+        environment:
+            - LOAD_EX=n
+            - EXECUTOR=Local
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        volumes:
+            - ./dags:/usr/local/airflow/dags
+            - ./spark:/usr/local/airflow/spark
+            # - ./plugins:/usr/local/airflow/plugins
+        ports:
+            - "8080:8080"
+            - "4040:4040"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
