@@ -5,7 +5,7 @@ from pyspark.sql.types import TimestampType
 
 
 HOME = '/usr/local/airflow/spark'
-spark = SparkSession.builder.appName('Telegraph').getOrCreate()
+spark = SparkSession.builder.appName('Example').getOrCreate()
 
 schema = StructType() \
     .add('uid', IntegerType(), True) \
